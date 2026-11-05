@@ -4,9 +4,9 @@ import emailjs, { init } from "emailjs-com";
 import { getParentUser, parentsAuthorizationsByCode, relationshipsByUserId, listLocations } from "./queries";
 import { createParentsAuthorization, updateParentsAuthorization } from "./mutations";
 
-// Configuración EmailJS existente en el front admin
+// Configuración EmailJS — template dedicado de reagendamientos (contenido en html_content)
 const EMAILJS_SERVICE = "service_ucb8wga";
-const EMAILJS_TEMPLATE = "template_rbmzu0w";
+const EMAILJS_TEMPLATE = "template_eedooa7";
 init("Csc41asZklkk5HTWk");
 
 const client = generateClient();
@@ -32,18 +32,33 @@ export const createAuthorizationCode = async (userId: string): Promise<any> => {
 
 export const sendCodeEmail = async (params: { email: string; name: string; code: string }) => {
   const appUrl = window.location.origin;
-  // Alias de destinatario: distintos templates de EmailJS usan distintos nombres de campo "To"
+  const htmlContent = `
+    <div style="font-family: 'DM Sans', Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
+      <h2 style="color: #6821A1;">Hola ${params.name},</h2>
+      <p style="color: #334155; font-size: 15px;">
+        Recibimos una solicitud de acceso al portal de reagendamientos de MiniSwimmer.
+      </p>
+      <p style="color: #334155; font-size: 15px;">Tu código de acceso es:</p>
+      <div style="text-align: center; margin: 24px 0;">
+        <span style="display: inline-block; background: #6821A1; color: #ffffff; font-size: 28px; letter-spacing: 8px; padding: 14px 28px; border-radius: 10px; font-weight: bold;">
+          ${params.code}
+        </span>
+      </div>
+      <p style="color: #334155; font-size: 15px;">
+        Ingresa el código en
+        <a href="${appUrl}" style="color: #7E4996; font-weight: bold;">${appUrl}</a>
+      </p>
+      <p style="color: #94a3b8; font-size: 12px; margin-top: 32px;">
+        Si no solicitaste este código, puedes ignorar este mensaje.
+      </p>
+    </div>`;
+
   return emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
     to_email: params.email,
-    to_client_email: params.email,
-    email: params.email,
-    user_email: params.email,
     to_name: params.name,
     reply_to: "hola@miniswimmer.cl",
     from_name: "MiniSwimmer",
-    to_code: params.code,
-    to_link: appUrl,
-    message: `Tu código de acceso es: ${params.code}. Ingresa en ${appUrl}`,
+    html_content: htmlContent,
   });
 };
 
