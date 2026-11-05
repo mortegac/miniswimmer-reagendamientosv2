@@ -95,15 +95,15 @@ function Dashboard() {
         <div className="flex justify-between items-center">
           <Logo />
           <div className="flex items-center gap-4">
-            <span className="text-slate-500 hidden sm:inline">{parent?.name}</span>
-            <Button variant="outline-secondary" rounded onClick={handleLogout} className="px-4 py-2">
+            <span className="text-white hidden sm:inline">{parent?.name}</span>
+            <Button variant="outline-secondary" rounded onClick={handleLogout} className="px-4 py-2 text-white border-white/60 hover:bg-white/10">
               Salir
             </Button>
           </div>
         </div>
 
-        <h1 className="text-2xl font-medium mt-6">Sesiones activas</h1>
-        <p className="text-slate-500">Selecciona una sesión para ver el detalle</p>
+        <h1 className="text-2xl font-medium mt-6 text-white">Sesiones activas</h1>
+        <p className="text-white/80">Selecciona una sesión para ver el detalle</p>
 
         {isLoading && (
           <div className="flex justify-center py-20">
