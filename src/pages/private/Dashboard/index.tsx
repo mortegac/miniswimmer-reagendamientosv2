@@ -47,6 +47,20 @@ const STATUS_LABEL: Record<string, string> = {
   USED: "SESIÓN UTILIZADA",
 };
 
+// Diccionario de relaciones (enum v2RelationType)
+const RELATION_LABEL: Record<string, string> = {
+  FATHER: "Padre",
+  MOTHER: "Madre",
+  GRANDMOTHER: "Abuela",
+  GRANDFATHER: "Abuelo",
+  UNCLE: "Tío",
+  AUNT: "Tía",
+  COUSIN: "Primo/a",
+  FAMILYS_FRIEND: "Amigo de la familia",
+  OTHER: "Otro",
+  NONE: "",
+};
+
 // Solo sesiones desde hoy hacia adelante
 const todayISO = new Date().toISOString().slice(0, 10);
 const isUpcoming = (s: any) => (s?.date || "").slice(0, 10) >= todayISO;
@@ -116,7 +130,7 @@ function Dashboard() {
                     <h2 className="text-lg font-medium capitalize">
                       {student.name} {student.lastName}
                     </h2>
-                    <p className="text-slate-400 text-sm capitalize">{rel.relationType?.toLowerCase()}</p>
+                    <p className="text-slate-400 text-sm">{RELATION_LABEL[rel.relationType] ?? rel.relationType}</p>
                   </div>
                 </div>
 
