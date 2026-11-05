@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { execSync } from "child_process";
 
-const PARENT_EMAIL = "mortegac@gmail.com";
+const PARENT_EMAIL = "valentina.concha.ramirez@gmail.com";
 const TABLE = "v2ParentsAuthorization-u5x5i3ucwvc43j4peic26jnrlq-NONE";
 const PROFILE = "MINISWIMMER-05FEB2026";
 
@@ -45,10 +45,10 @@ test("flujo completo: email → código → dashboard → slideover de sesión",
   // Paso 3: dashboard privado
   await expect(page).toHaveURL(/\/dashboard/, { timeout: 15000 });
   await expect(page.getByText("Sesiones activas")).toBeVisible();
-  await expect(page.getByText("Alma Ortega", { exact: false })).toBeVisible({ timeout: 15000 });
+  await expect(page.getByText("Gonzalez Concha", { exact: false }).first()).toBeVisible({ timeout: 15000 });
 
   // Paso 4: seleccionar una sesión → slideover con el detalle
-  await page.locator("button:has-text('Sesión')").first().click();
+  await page.getByRole("button", { name: "Ver detalle" }).first().click();
   await expect(page.getByText("Detalle de la sesión")).toBeVisible();
   await expect(page.getByText("Sede")).toBeVisible();
   await expect(page.getByText("Curso")).toBeVisible();

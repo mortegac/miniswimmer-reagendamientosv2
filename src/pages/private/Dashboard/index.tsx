@@ -23,6 +23,34 @@ const formatDate = (iso: string) => {
   return d.toLocaleDateString("es-CL", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 };
 
+const formatShortDate = (iso: string) => {
+  if (!iso) return "—";
+  const [y, m, d] = iso.slice(0, 10).split("-");
+  return `${d}-${m}-${y}`;
+};
+
+// "X años, Y meses" desde birthdate ISO
+const formatAge = (birthdate?: string) => {
+  if (!birthdate) return "";
+  const b = new Date(birthdate);
+  const now = new Date();
+  let months = (now.getFullYear() - b.getFullYear()) * 12 + (now.getMonth() - b.getMonth());
+  if (now.getDate() < b.getDate()) months--;
+  const years = Math.floor(months / 12);
+  const rest = months % 12;
+  return `${years} años${rest > 0 ? `, ${rest} meses` : ""}`;
+};
+
+const STATUS_LABEL: Record<string, string> = {
+  ACTIVE: "SESIÓN VIGENTE",
+  RECOVERED: "SESIÓN RECUPERADA",
+  USED: "SESIÓN UTILIZADA",
+};
+
+// Solo sesiones desde hoy hacia adelante
+const todayISO = new Date().toISOString().slice(0, 10);
+const isUpcoming = (s: any) => (s?.date || "").slice(0, 10) >= todayISO;
+
 function Dashboard() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -92,37 +120,58 @@ function Dashboard() {
                   </div>
                 </div>
 
-                {enrollments.length === 0 && (
-                  <p className="text-slate-400 mt-4">Sin matrículas vigentes</p>
+                {enrollments.every((e: any) => (e?.sessionDetails?.items || []).filter(isUpcoming).length === 0) && (
+                  <p className="text-slate-400 mt-4">Sin sesiones próximas</p>
                 )}
 
                 {enrollments.map((enr: any) => {
-                  const sessions = enr?.sessionDetails?.items || [];
+                  const sessions = (enr?.sessionDetails?.items || []).filter(isUpcoming);
                   if (sessions.length === 0) return null;
                   return (
-                    <div key={enr.id} className="mt-4 border-t border-dashed pt-4">
-                      <p className="font-medium text-primary">{enr.course?.title || "Curso"}</p>
-                      <p className="text-slate-400 text-sm">{enr.scheduleName}</p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
-                        {[...sessions]
-                          .sort((a: any, b: any) => (a.date > b.date ? 1 : -1))
-                          .map((s: any) => (
-                            <button
-                              key={s.id}
-                              type="button"
-                              onClick={() => setSelectedSession({ ...s, studentName: `${student.name} ${student.lastName}` })}
-                              className="flex items-center justify-between px-4 py-3 border rounded-lg hover:bg-primary/5 hover:border-primary transition-colors text-left"
-                            >
-                              <span className="flex items-center gap-2">
-                                <Lucide icon="Calendar" className="w-4 h-4 text-primary" />
-                                <span className="capitalize">{formatDate(s.date)}</span>
+                    <div key={enr.id} className="mt-5 space-y-5">
+                      {[...sessions]
+                        .sort((a: any, b: any) => (a.date > b.date ? 1 : -1))
+                        .map((s: any) => (
+                          <div key={s.id} className="rounded-xl overflow-hidden shadow-sm bg-slate-200/60 p-1.5">
+                            {/* Header: DÍA-HORA | CURSO */}
+                            <div className="flex items-center justify-between bg-slate-800 text-white rounded-lg px-4 py-2.5">
+                              <span className="font-bold tracking-wide uppercase text-sm sm:text-base">
+                                {(DAYS[s.schedule?.day?.toLowerCase()] || s.schedule?.day || "—")}-{s.schedule?.startHour || "—"}
                               </span>
-                              <span className="text-slate-400 text-sm">
-                                Sesión {s.sessionNumber ?? "—"}/{s.totalSessions ?? "—"}
+                              <span className="font-bold tracking-wide uppercase text-sm sm:text-base text-right">
+                                {s.course?.title || enr.course?.title || "Curso"}
                               </span>
-                            </button>
-                          ))}
-                      </div>
+                            </div>
+                            {/* Body */}
+                            <div className="flex mt-1.5 gap-1.5">
+                              <div className="flex-1 bg-white rounded-lg p-5">
+                                <h3 className="text-xl font-medium capitalize">
+                                  {student.name} {student.lastName}
+                                </h3>
+                                <p className="text-slate-500 text-sm mt-1">{formatAge(student.birthdate)}</p>
+                                <div className="flex items-center gap-4 mt-4">
+                                  <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                    <Lucide icon="User" className="w-7 h-7 text-primary" />
+                                  </div>
+                                  <div>
+                                    <span className="inline-block bg-slate-300/70 text-slate-700 text-xs font-medium tracking-wide rounded-full px-4 py-1.5">
+                                      {STATUS_LABEL[s.status] || s.status}
+                                    </span>
+                                    <p className="text-slate-500 text-sm mt-2">{formatShortDate(s.date)}</p>
+                                  </div>
+                                </div>
+                              </div>
+                              {/* Acción */}
+                              <button
+                                type="button"
+                                onClick={() => setSelectedSession({ ...s, studentName: `${student.name} ${student.lastName}` })}
+                                className="w-28 sm:w-32 bg-primary/70 hover:bg-primary transition-colors rounded-lg flex items-center justify-center text-white font-medium tracking-widest uppercase text-sm text-center px-2"
+                              >
+                                Ver detalle
+                              </button>
+                            </div>
+                          </div>
+                        ))}
                     </div>
                   );
                 })}
