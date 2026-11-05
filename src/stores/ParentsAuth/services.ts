@@ -32,8 +32,12 @@ export const createAuthorizationCode = async (userId: string): Promise<any> => {
 
 export const sendCodeEmail = async (params: { email: string; name: string; code: string }) => {
   const appUrl = window.location.origin;
+  // Alias de destinatario: distintos templates de EmailJS usan distintos nombres de campo "To"
   return emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
     to_email: params.email,
+    to_client_email: params.email,
+    email: params.email,
+    user_email: params.email,
     to_name: params.name,
     reply_to: "hola@miniswimmer.cl",
     from_name: "MiniSwimmer",
