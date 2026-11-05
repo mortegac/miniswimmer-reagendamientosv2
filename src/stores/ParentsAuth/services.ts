@@ -53,11 +53,10 @@ export const sendCodeEmail = async (params: { email: string; name: string; code:
       </p>
     </div>`;
 
+  // Variables del template template_eedooa7: from_email (destinatario), asunto, html_content
   return emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
-    to_email: params.email,
-    to_name: params.name,
-    reply_to: "hola@miniswimmer.cl",
-    from_name: "MiniSwimmer",
+    from_email: params.email,
+    asunto: "Tu código de acceso MiniSwimmer",
     html_content: htmlContent,
   });
 };
