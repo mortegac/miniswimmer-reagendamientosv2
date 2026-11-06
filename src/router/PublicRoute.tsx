@@ -36,8 +36,8 @@ export const publicRoutes = {
           element: <Dashboard />,
         },
         {
-          path: PUBLIC_TOKEN,
-          element: <Payment />,
+          path: ":accessCode",
+          element: <Access />,
         },
         {
           path: PUBLIC_RETURN,

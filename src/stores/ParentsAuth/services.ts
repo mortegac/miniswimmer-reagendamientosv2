@@ -30,8 +30,10 @@ export const createAuthorizationCode = async (userId: string): Promise<any> => {
   return res?.data?.createV2ParentsAuthorization || null;
 };
 
+const APP_URL = "https://reagendar.miniswimmer.cl";
+
 export const sendCodeEmail = async (params: { email: string; name: string; code: string }) => {
-  const appUrl = window.location.origin;
+  const appUrl = `${APP_URL}/${params.code}`;
   const htmlContent = `
     <div style="font-family: 'DM Sans', Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
       <h2 style="color: #6821A1;">Hola ${params.name},</h2>

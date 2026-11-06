@@ -39,8 +39,8 @@ test("flujo completo: email → código → dashboard → slideover de sesión",
   const code = latestPendingCode();
   expect(code).toMatch(/^\d{8}$/);
 
-  await page.locator("#code").fill(code);
-  await page.getByRole("button", { name: "Ingresar" }).click();
+  // Ingreso directo vía URL con el código (link del email)
+  await page.goto(`/${code}`);
 
   // Paso 3: dashboard privado
   await expect(page).toHaveURL(/\/dashboard/, { timeout: 15000 });
