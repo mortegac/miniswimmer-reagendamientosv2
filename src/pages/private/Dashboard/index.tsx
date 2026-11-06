@@ -132,33 +132,33 @@ function Dashboard() {
                   const sessions = (enr?.sessionDetails?.items || []).filter(isUpcoming);
                   if (sessions.length === 0) return null;
                   return (
-                    <div key={enr.id} className="mt-3 space-y-3">
+                    <div key={enr.id} className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {[...sessions]
                         .sort((a: any, b: any) => (a.date > b.date ? 1 : -1))
                         .map((s: any) => (
-                          <div key={s.id} className="rounded-xl overflow-hidden shadow-lg shadow-black/10 ring-1 ring-white/15">
+                          <div key={s.id} className="bg-white rounded-xl overflow-hidden shadow-md shadow-black/5">
                             {/* Header: DÍA-HORA | CURSO */}
-                            <div className="flex items-center justify-between gap-2 bg-slate-900/80 text-white px-4 py-2">
-                              <span className="font-bold tracking-wider uppercase text-xs sm:text-sm whitespace-nowrap">
+                            <div className="flex items-center justify-between gap-2 bg-slate-800 text-white px-4 py-2">
+                              <span className="font-bold tracking-wider uppercase text-xs whitespace-nowrap">
                                 {(DAYS[s.schedule?.day?.toLowerCase()] || s.schedule?.day || "—")}-{s.schedule?.startHour || "—"}
                               </span>
-                              <span className="font-bold tracking-wider uppercase text-xs sm:text-sm text-right truncate">
+                              <span className="font-bold tracking-wider uppercase text-xs text-right truncate">
                                 {s.course?.title || enr.course?.title || "Curso"}
                               </span>
                             </div>
                             {/* Body compacto: fecha + estado + acción */}
-                            <div className="flex items-center justify-between gap-3 bg-white/10 backdrop-blur-sm px-4 py-2.5">
-                              <div className="flex items-center gap-3 min-w-0">
-                                <Lucide icon="Calendar" className="w-4 h-4 text-white/70 shrink-0" />
-                                <span className="text-white font-medium whitespace-nowrap">{formatShortDate(s.date)}</span>
-                                <span className="hidden sm:inline-block bg-white/15 text-white/90 text-[11px] font-medium tracking-wide rounded-full px-3 py-1">
+                            <div className="px-4 py-3">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <Lucide icon="Calendar" className="w-4 h-4 text-primary shrink-0" />
+                                <span className="text-slate-700 font-medium whitespace-nowrap">{formatShortDate(s.date)}</span>
+                                <span className="ml-auto bg-slate-100 text-slate-500 text-[11px] font-medium tracking-wide rounded-full px-3 py-1 whitespace-nowrap">
                                   {STATUS_LABEL[s.status] || s.status}
                                 </span>
                               </div>
                               <button
                                 type="button"
                                 onClick={() => setSelectedSession({ ...s, studentName: `${student.name} ${student.lastName}` })}
-                                className="shrink-0 bg-white text-primary hover:bg-white/90 transition-colors rounded-full font-semibold tracking-wider uppercase text-xs px-5 py-2"
+                                className="mt-3 w-full bg-primary/80 hover:bg-primary transition-colors text-white rounded-full font-semibold tracking-wider uppercase text-xs px-5 py-2.5"
                               >
                                 Reagendar
                               </button>
