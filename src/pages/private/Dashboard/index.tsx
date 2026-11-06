@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Button from "@/components/Base/Button";
@@ -67,6 +67,20 @@ function Dashboard() {
     dispatch(loadDashboard(parent.id));
   }, []);
 
+  // Alumnos con sesiones próximas primero (el primer tab siempre tiene sesiones activas)
+  const sortedRels = useMemo(() => {
+    const upcomingCount = (rel: any) =>
+      (rel?.student?.enrollments?.items || []).reduce(
+        (sum: number, e: any) => sum + (e?.sessionDetails?.items || []).filter(isUpcoming).length,
+        0
+      );
+    return [...relationships]
+      .filter((r: any) => r?.student)
+      .sort((a: any, b: any) => upcomingCount(b) - upcomingCount(a));
+  }, [relationships]);
+
+  useEffect(() => { setActiveTab(0); }, [sortedRels.length]);
+
   const closeSlideover = () => setSelectedSession(null);
 
   // Reagendamiento exitoso: cerrar ventana y refrescar sesiones
@@ -95,8 +109,8 @@ function Dashboard() {
           </div>
         </div>
 
-        <h1 className="text-2xl font-medium mt-6 text-white">Sesiones activas</h1>
-        <p className="text-white/80">Selecciona una sesión para ver el detalle</p>
+        <h1 className="text-2xl font-medium mt-6 text-white">Sistema de Reagendamiento</h1>
+        <p className="text-white/80">Seleccione al Alumno para ver sus sesiones</p>
 
         {isLoading && (
           <div className="flex justify-center py-20">
@@ -108,11 +122,11 @@ function Dashboard() {
           <p className="text-red-500 mt-6">{errorMessage}</p>
         )}
 
-        {!isLoading && relationships.length > 0 && (
+        {!isLoading && sortedRels.length > 0 && (
           <div className="box mt-6 p-5 sm:p-6">
             {/* Tabs: un alumno por tab */}
             <div className="flex gap-1 border-b border-slate-200 overflow-x-auto">
-              {relationships.map((rel: any, i: number) => {
+              {sortedRels.map((rel: any, i: number) => {
                 const st = rel?.student;
                 if (!st) return null;
                 const active = i === activeTab;
@@ -133,7 +147,7 @@ function Dashboard() {
               })}
             </div>
 
-            {[relationships[Math.min(activeTab, relationships.length - 1)]].map((rel: any) => {
+            {[sortedRels[Math.min(activeTab, sortedRels.length - 1)]].map((rel: any) => {
               const student = rel?.student;
               if (!student) return null;
               const enrollments = student?.enrollments?.items || [];
@@ -218,7 +232,7 @@ function Dashboard() {
           </div>
         )}
 
-        {!isLoading && relationships.length === 0 && !errorMessage && (
+        {!isLoading && sortedRels.length === 0 && !errorMessage && (
           <div className="rounded-xl bg-white/10 ring-1 ring-white/15 p-8 mt-6 text-center text-white/70">
             No encontramos estudiantes asociados a tu cuenta
           </div>
