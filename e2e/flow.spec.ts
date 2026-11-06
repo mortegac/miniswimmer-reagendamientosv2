@@ -44,7 +44,7 @@ test("flujo completo: email → código → dashboard → slideover de sesión",
 
   // Paso 3: dashboard privado
   await expect(page).toHaveURL(/\/dashboard/, { timeout: 15000 });
-  await expect(page.getByText("Sesiones activas")).toBeVisible();
+  await expect(page.getByText("Sistema de Reagendamiento")).toBeVisible();
   await expect(page.getByText("Gonzalez Concha", { exact: false }).first()).toBeVisible({ timeout: 15000 });
 
   // Paso 4: seleccionar una sesión → wizard directo con resumen en el paso 1

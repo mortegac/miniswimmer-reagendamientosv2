@@ -14,83 +14,182 @@
 ```
 Error: expect(locator).toBeVisible() failed
 
-Locator: getByText('Sesiones activas')
+Locator: locator('[role="dialog"]').getByText('Fecha')
 Expected: visible
-Timeout: 5000ms
-Error: element(s) not found
+Error: strict mode violation: locator('[role="dialog"]').getByText('Fecha') resolved to 2 elements:
+    1) <span class="text-slate-400 shrink-0">Fecha</span> aka getByText('Fecha').first()
+    2) <span class="text-xs text-slate-400">Fecha</span> aka getByText('Fecha').nth(1)
 
 Call log:
-  - Expect "toBeVisible" getByText('Sesiones activas') with timeout 5000ms
-  - waiting for getByText('Sesiones activas')
+  - Expect "toBeVisible" locator('[role="dialog"]').getByText('Fecha') with timeout 5000ms
+  - waiting for locator('[role="dialog"]').getByText('Fecha')
 
 ```
 
+# Page snapshot
+
 ```yaml
-- img
-- text: Valentina Concha Ramirez
-- button "Salir"
-- heading "Sistema de Reagendamiento" [level=1]
-- paragraph: Seleccione al Alumno para ver sus sesiones
-- button "Belen Gonzalez Concha"
-- button "Rafael Gonzalez Concha"
-- img
-- heading "Belen Gonzalez Concha" [level=2]
-- paragraph: Madre
-- paragraph: Bebes 2 a 23 Meses
-- paragraph: Domingo · 10:00 hrs
-- img
-- text: 15 Nov 2026 SESIÓN VIGENTE
-- button "Reagendar"
-- paragraph: Bebes 2 a 23 Meses
-- paragraph: Domingo · 10:00 hrs
-- img
-- text: 22 Nov 2026 SESIÓN VIGENTE
-- button "Reagendar"
-- paragraph: Bebes 2 a 23 Meses
-- paragraph: Domingo · 10:00 hrs
-- img
-- text: 29 Nov 2026 SESIÓN VIGENTE
-- button "Reagendar"
-- paragraph: Bebes 2 a 23 Meses
-- paragraph: Domingo · 10:00 hrs
-- img
-- text: 6 Dic 2026 SESIÓN VIGENTE
-- button "Reagendar"
-- paragraph: Bebes 2 a 23 Meses
-- paragraph: Domingo · 10:00 hrs
-- img
-- text: 13 Dic 2026 SESIÓN VIGENTE
-- button "Reagendar"
-- paragraph: Bebes 2 a 23 Meses
-- paragraph: Domingo · 10:00 hrs
-- img
-- text: 20 Dic 2026 SESIÓN VIGENTE
-- button "Reagendar"
-- paragraph: Bebes 2 a 23 Meses
-- paragraph: Domingo · 10:00 hrs
-- img
-- text: 27 Dic 2026 SESIÓN VIGENTE
-- button "Reagendar"
-- paragraph: Bebes 2 a 23 Meses
-- paragraph: Domingo · 10:00 hrs
-- img
-- text: 3 Ene 2027 SESIÓN VIGENTE
-- button "Reagendar"
-- paragraph: Bebes 2 a 23 Meses
-- paragraph: Domingo · 10:00 hrs
-- img
-- text: 17 Ene 2027 SESIÓN VIGENTE
-- button "Reagendar"
-- paragraph: Bebes 2 a 23 Meses
-- paragraph: Domingo · 10:00 hrs
-- img
-- text: 31 Ene 2027 SESIÓN VIGENTE
-- button "Reagendar"
-- paragraph: Bebes 2 a 23 Meses
-- paragraph: Domingo · 10:00 hrs
-- img
-- text: 7 Feb 2027 SESIÓN VIGENTE
-- button "Reagendar"
+- generic [ref=e1]:
+  - generic [ref=e6]:
+    - generic [ref=e37]:
+      - generic [ref=e38]: Valentina Concha Ramirez
+      - button [ref=e39] [cursor=pointer]: Salir
+    - heading [level=1] [ref=e40]: Sistema de Reagendamiento
+    - paragraph [ref=e41]: Seleccione al Alumno para ver sus sesiones
+    - generic [ref=e42]:
+      - generic [ref=e43]:
+        - button [ref=e44] [cursor=pointer]: Belen Gonzalez Concha
+        - button [ref=e45] [cursor=pointer]: Rafael Gonzalez Concha
+      - generic [ref=e46]:
+        - generic [ref=e52]:
+          - heading [level=2] [ref=e53]: Belen Gonzalez Concha
+          - paragraph [ref=e54]: Madre
+        - generic [ref=e55]:
+          - generic [ref=e56]:
+            - paragraph [ref=e57]: Bebes 2 a 23 Meses
+            - paragraph [ref=e58]: Domingo · 10:00 hrs
+            - generic [ref=e59]:
+              - generic [ref=e62]: 15 Nov 2026
+              - generic [ref=e63]: SESIÓN VIGENTE
+            - button [ref=e64] [cursor=pointer]: Reagendar
+          - generic [ref=e65]:
+            - paragraph [ref=e66]: Bebes 2 a 23 Meses
+            - paragraph [ref=e67]: Domingo · 10:00 hrs
+            - generic [ref=e68]:
+              - generic [ref=e71]: 22 Nov 2026
+              - generic [ref=e72]: SESIÓN VIGENTE
+            - button [ref=e73] [cursor=pointer]: Reagendar
+          - generic [ref=e74]:
+            - paragraph [ref=e75]: Bebes 2 a 23 Meses
+            - paragraph [ref=e76]: Domingo · 10:00 hrs
+            - generic [ref=e77]:
+              - generic [ref=e80]: 29 Nov 2026
+              - generic [ref=e81]: SESIÓN VIGENTE
+            - button [ref=e82] [cursor=pointer]: Reagendar
+          - generic [ref=e83]:
+            - paragraph [ref=e84]: Bebes 2 a 23 Meses
+            - paragraph [ref=e85]: Domingo · 10:00 hrs
+            - generic [ref=e86]:
+              - generic [ref=e89]: 6 Dic 2026
+              - generic [ref=e90]: SESIÓN VIGENTE
+            - button [ref=e91] [cursor=pointer]: Reagendar
+          - generic [ref=e92]:
+            - paragraph [ref=e93]: Bebes 2 a 23 Meses
+            - paragraph [ref=e94]: Domingo · 10:00 hrs
+            - generic [ref=e95]:
+              - generic [ref=e98]: 13 Dic 2026
+              - generic [ref=e99]: SESIÓN VIGENTE
+            - button [ref=e100] [cursor=pointer]: Reagendar
+          - generic [ref=e101]:
+            - paragraph [ref=e102]: Bebes 2 a 23 Meses
+            - paragraph [ref=e103]: Domingo · 10:00 hrs
+            - generic [ref=e104]:
+              - generic [ref=e107]: 20 Dic 2026
+              - generic [ref=e108]: SESIÓN VIGENTE
+            - button [ref=e109] [cursor=pointer]: Reagendar
+          - generic [ref=e110]:
+            - paragraph [ref=e111]: Bebes 2 a 23 Meses
+            - paragraph [ref=e112]: Domingo · 10:00 hrs
+            - generic [ref=e113]:
+              - generic [ref=e116]: 27 Dic 2026
+              - generic [ref=e117]: SESIÓN VIGENTE
+            - button [ref=e118] [cursor=pointer]: Reagendar
+          - generic [ref=e119]:
+            - paragraph [ref=e120]: Bebes 2 a 23 Meses
+            - paragraph [ref=e121]: Domingo · 10:00 hrs
+            - generic [ref=e122]:
+              - generic [ref=e125]: 3 Ene 2027
+              - generic [ref=e126]: SESIÓN VIGENTE
+            - button [ref=e127] [cursor=pointer]: Reagendar
+          - generic [ref=e128]:
+            - paragraph [ref=e129]: Bebes 2 a 23 Meses
+            - paragraph [ref=e130]: Domingo · 10:00 hrs
+            - generic [ref=e131]:
+              - generic [ref=e134]: 17 Ene 2027
+              - generic [ref=e135]: SESIÓN VIGENTE
+            - button [ref=e136] [cursor=pointer]: Reagendar
+          - generic [ref=e137]:
+            - paragraph [ref=e138]: Bebes 2 a 23 Meses
+            - paragraph [ref=e139]: Domingo · 10:00 hrs
+            - generic [ref=e140]:
+              - generic [ref=e143]: 31 Ene 2027
+              - generic [ref=e144]: SESIÓN VIGENTE
+            - button [ref=e145] [cursor=pointer]: Reagendar
+          - generic [ref=e146]:
+            - paragraph [ref=e147]: Bebes 2 a 23 Meses
+            - paragraph [ref=e148]: Domingo · 10:00 hrs
+            - generic [ref=e149]:
+              - generic [ref=e152]: 7 Feb 2027
+              - generic [ref=e153]: SESIÓN VIGENTE
+            - button [ref=e154] [cursor=pointer]: Reagendar
+  - generic:
+    - generic:
+      - generic:
+        - dialog "Reagendar sesión":
+          - generic [ref=e157]:
+            - heading "Reagendar sesión" [level=2] [ref=e159]
+            - generic [ref=e161]:
+              - generic [ref=e162]:
+                - generic [ref=e163]:
+                  - generic [ref=e164]: Fecha
+                  - generic [ref=e165]: domingo, 15 de noviembre de 2026
+                - generic [ref=e166]:
+                  - generic [ref=e167]: Sede
+                  - generic [ref=e168]: VITACURA
+                - generic [ref=e169]:
+                  - generic [ref=e170]: Curso
+                  - generic [ref=e171]: Bebes 2 a 23 Meses
+                - generic [ref=e172]:
+                  - generic [ref=e173]: Horario
+                  - generic [ref=e174]: Domingo 10:00 - 10:30
+              - generic [ref=e175]:
+                - generic [ref=e176]:
+                  - generic [ref=e177]: "1"
+                  - generic [ref=e178]: Sede
+                - generic [ref=e180]:
+                  - generic [ref=e181]: "2"
+                  - generic [ref=e182]: Curso
+                - generic [ref=e184]:
+                  - generic [ref=e185]: "3"
+                  - generic [ref=e186]: Fecha
+              - generic [ref=e187]:
+                - generic [ref=e188]:
+                  - paragraph [ref=e189]: CHILLAN
+                  - button [active] [ref=e191] [cursor=pointer]:
+                    - paragraph [ref=e192]: PISCINA CHILLAN
+                    - paragraph [ref=e193]: Km 8 ruta N-55(Camino lo pinto)
+                - generic [ref=e194]:
+                  - paragraph [ref=e195]: RANCAGUA
+                  - button [ref=e197] [cursor=pointer]:
+                    - paragraph [ref=e198]: CLINICA LOS CANELOS
+                    - paragraph [ref=e199]: Domingo Faustino Sarmiento 1137, Rancagua, Chile
+                - generic [ref=e200]:
+                  - paragraph [ref=e201]: STGO-ALTO
+                  - generic [ref=e202]:
+                    - button [ref=e203] [cursor=pointer]:
+                      - paragraph [ref=e204]: MI CLUB
+                      - paragraph [ref=e205]: "Valenzuela Puelma #8551, La Reina"
+                    - button [ref=e206] [cursor=pointer]:
+                      - paragraph [ref=e207]: SEDE PEÑALOLEN
+                      - paragraph [ref=e208]: Camino de la tierra s/n, Peñalolen
+                    - button [ref=e209] [cursor=pointer]:
+                      - paragraph [ref=e210]: Santiago Centro | Aquatiempo
+                      - paragraph [ref=e211]: Av. Ejercito Libertador 346, Santiago Centro
+                    - button [ref=e212] [cursor=pointer]:
+                      - paragraph [ref=e213]: VITACURA
+                      - paragraph [ref=e214]: Georgia 1143, Vitacura
+                    - button [ref=e215] [cursor=pointer]:
+                      - paragraph [ref=e216]: ÑUÑOA-KIDS
+                      - paragraph [ref=e217]: Pedro Aguirre Cerda 682, Ñuñoa
+                    - button [ref=e218] [cursor=pointer]:
+                      - paragraph [ref=e219]: Ñuñoa
+                      - paragraph [ref=e220]: Dublé Almeyda 2191, Ñuñoa
+                - generic [ref=e221]:
+                  - paragraph [ref=e222]: VALPO-UNO
+                  - button [ref=e224] [cursor=pointer]:
+                    - paragraph [ref=e225]: VIñA-DEL-MAR
+                    - paragraph [ref=e226]: "Los Carolinos #25, Miraflores bajo. Viña del Mar"
+              - button "Cancelar" [ref=e229] [cursor=pointer]
 ```
 
 # Test source
@@ -142,15 +241,15 @@ Call log:
   44 | 
   45 |   // Paso 3: dashboard privado
   46 |   await expect(page).toHaveURL(/\/dashboard/, { timeout: 15000 });
-> 47 |   await expect(page.getByText("Sesiones activas")).toBeVisible();
-     |                                                    ^ Error: expect(locator).toBeVisible() failed
+  47 |   await expect(page.getByText("Sistema de Reagendamiento")).toBeVisible();
   48 |   await expect(page.getByText("Gonzalez Concha", { exact: false }).first()).toBeVisible({ timeout: 15000 });
   49 | 
   50 |   // Paso 4: seleccionar una sesión → wizard directo con resumen en el paso 1
   51 |   await page.getByRole("button", { name: "Reagendar" }).first().click();
   52 |   const panel = page.locator('[role="dialog"]');
   53 |   await expect(page.getByText("Reagendar sesión")).toBeVisible();
-  54 |   await expect(panel.getByText("Fecha")).toBeVisible();
+> 54 |   await expect(panel.getByText("Fecha")).toBeVisible();
+     |                                          ^ Error: expect(locator).toBeVisible() failed
   55 |   await expect(panel.getByText("Horario")).toBeVisible();
   56 | 
   57 |   // Paso 1: sede
