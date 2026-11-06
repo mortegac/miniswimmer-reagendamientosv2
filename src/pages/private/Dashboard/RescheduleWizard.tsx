@@ -24,11 +24,11 @@ type DateOption = {
   scheduleId: string;
 };
 
-// Próximas ocurrencias de los horarios del curso, máximo 15 días hacia adelante
+// Próximas ocurrencias de los horarios del curso, máximo 20 días hacia adelante
 function buildDateOptions(schedules: any[]): DateOption[] {
   const opts: DateOption[] = [];
   const start = new Date();
-  for (let i = 1; i <= 15; i++) {
+  for (let i = 1; i <= 20; i++) {
     const d = new Date(start);
     d.setDate(start.getDate() + i);
     const dow = d.getDay();
@@ -139,7 +139,7 @@ export function RescheduleWizard({ session, locations, onDone, onCancel }: Props
     const opts = buildDateOptions(course.schedules || []);
     setDateOptions(opts);
     setStep(3);
-    if (opts.length === 0) setError("Este curso no tiene fechas disponibles en los próximos 15 días");
+    if (opts.length === 0) setError("Este curso no tiene fechas disponibles en los próximos 20 días");
   };
 
   const finish = async () => {
@@ -177,8 +177,8 @@ export function RescheduleWizard({ session, locations, onDone, onCancel }: Props
 
   return (
     <div className="flex flex-col h-full">
-      {/* Resumen de la sesión a reagendar (solo en el paso 1) */}
-      {step === 1 && (
+      {/* Resumen de la sesión a reagendar (visible en todos los pasos) */}
+      {(
         <div className="divide-y divide-slate-100 text-sm border-b border-slate-100 mb-4 pb-2">
           {[
             ["Fecha", <span className="capitalize">{formatLongDate(session?.date)}</span>],
