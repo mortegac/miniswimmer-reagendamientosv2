@@ -51,7 +51,7 @@ test("flujo completo: email → código → dashboard → slideover de sesión",
   await page.getByRole("button", { name: "Reagendar" }).first().click();
   const panel = page.locator('[role="dialog"]');
   await expect(page.getByText("Reagendar sesión")).toBeVisible();
-  await expect(panel.getByText("Estudiante")).toBeVisible();
+  await expect(panel.getByText("Fecha")).toBeVisible();
   await expect(panel.getByText("Horario")).toBeVisible();
 
   // Paso 1: sede

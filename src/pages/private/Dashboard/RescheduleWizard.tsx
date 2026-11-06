@@ -170,15 +170,12 @@ export function RescheduleWizard({ session, locations, onDone, onCancel }: Props
       {step === 1 && (
         <div className="divide-y divide-slate-100 text-sm border-b border-slate-100 mb-4 pb-2">
           {[
-            ["Estudiante", <span className="capitalize">{session?.studentName}</span>],
             ["Fecha", <span className="capitalize">{formatLongDate(session?.date)}</span>],
             ["Sede", sessionLocation?.name || session?.locationId],
             ["Curso", session?.course?.title || session?.courseId],
             ["Horario", session?.schedule
               ? `${FULL_DAYS[session.schedule.day?.toLowerCase()] || session.schedule.day} ${session.schedule.startHour} - ${session.schedule.endHour}`
               : "—"],
-            ["Sesión", `${session?.sessionNumber ?? "—"} de ${session?.totalSessions ?? "—"}`],
-            ["Estado", SESSION_STATUS[session?.status] || session?.status],
           ].map(([label, value]) => (
             <div key={label as string} className="py-2 flex items-start justify-between gap-4">
               <span className="text-slate-400 shrink-0">{label}</span>
