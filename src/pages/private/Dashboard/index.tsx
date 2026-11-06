@@ -58,6 +58,7 @@ function Dashboard() {
 
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [activeTab, setActiveTab] = useState(0);
+  const [successMsg, setSuccessMsg] = useState("");
 
   useEffect(() => {
     if (!authorized || !parent) {
@@ -83,9 +84,11 @@ function Dashboard() {
 
   const closeSlideover = () => setSelectedSession(null);
 
-  // Reagendamiento exitoso: cerrar ventana y refrescar sesiones
+  // Reagendamiento exitoso: cerrar ventana, mostrar mensaje y refrescar sesiones
   const handleRescheduled = () => {
     closeSlideover();
+    setSuccessMsg("¡El cambio fue exitoso! Te enviamos un email con el detalle de la nueva clase.");
+    setTimeout(() => setSuccessMsg(""), 8000);
     if (parent) dispatch(loadDashboard(parent.id));
   };
 
@@ -115,6 +118,13 @@ function Dashboard() {
         {isLoading && (
           <div className="flex justify-center py-20">
             <LoadingIcon color="#FFFFFF" icon="oval" className="w-10 h-10" />
+          </div>
+        )}
+
+        {successMsg && (
+          <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl px-4 py-3 mt-6">
+            <Lucide icon="CheckCircle" className="w-5 h-5 shrink-0" />
+            <span className="text-sm font-medium">{successMsg}</span>
           </div>
         )}
 
@@ -250,6 +260,7 @@ function Dashboard() {
               <RescheduleWizard
                 session={selectedSession}
                 locations={locations}
+                parent={parent}
                 onDone={handleRescheduled}
                 onCancel={closeSlideover}
               />

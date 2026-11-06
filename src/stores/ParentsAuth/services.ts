@@ -147,3 +147,43 @@ export const rescheduleSessionDetail = async (input: {
   });
   return res?.data?.updateV2SessionDetail || null;
 };
+
+// Email de confirmación de reagendamiento al apoderado
+export const sendRescheduleEmail = async (params: {
+  email: string;
+  name: string;
+  oldDate: string;   // fecha original formateada
+  newDate: string;   // nueva fecha formateada (destacada)
+  newTime: string;   // horario nuevo
+  sede: string;
+  curso: string;
+}) => {
+  const htmlContent = `
+    <div style="font-family: 'DM Sans', Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 24px;">
+      <h2 style="color: #6821A1;">Hola ${params.name},</h2>
+      <p style="color: #334155; font-size: 15px;">
+        Tu clase fue reagendada correctamente. Estos son los detalles del cambio:
+      </p>
+      <p style="color: #94a3b8; font-size: 13px; margin-bottom: 4px;">Fecha original</p>
+      <p style="color: #64748b; font-size: 15px; margin-top: 0; text-decoration: line-through;">${params.oldDate}</p>
+      <div style="text-align: center; margin: 20px 0; background: #f5f0fa; border: 1px solid #6821A1; border-radius: 12px; padding: 18px;">
+        <p style="color: #6821A1; font-size: 13px; margin: 0 0 6px; text-transform: uppercase; letter-spacing: 1px;">Nueva fecha</p>
+        <p style="color: #6821A1; font-size: 24px; font-weight: bold; margin: 0;">${params.newDate}</p>
+        <p style="color: #7E4996; font-size: 16px; margin: 6px 0 0;">${params.newTime} hrs</p>
+      </div>
+      <table style="width: 100%; font-size: 15px; color: #334155; border-collapse: collapse;">
+        <tr><td style="padding: 6px 0; color: #94a3b8; width: 90px;">Sede</td><td style="padding: 6px 0; font-weight: bold;">${params.sede}</td></tr>
+        <tr><td style="padding: 6px 0; color: #94a3b8;">Curso</td><td style="padding: 6px 0; font-weight: bold;">${params.curso}</td></tr>
+        <tr><td style="padding: 6px 0; color: #94a3b8;">Horario</td><td style="padding: 6px 0; font-weight: bold;">${params.newTime} hrs</td></tr>
+      </table>
+      <p style="color: #94a3b8; font-size: 12px; margin-top: 28px;">
+        Si tienes dudas, responde este correo o escríbenos a hola@miniswimmer.cl
+      </p>
+    </div>`;
+
+  return emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
+    from_email: params.email,
+    asunto: "Clase reagendada | Miniswimmer",
+    html_content: htmlContent,
+  });
+};

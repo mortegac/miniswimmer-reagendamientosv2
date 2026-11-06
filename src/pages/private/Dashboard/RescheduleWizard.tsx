@@ -5,6 +5,7 @@ import {
   fetchCoursesByLocation,
   fetchSchedulesByCourse,
   rescheduleSessionDetail,
+  sendRescheduleEmail,
 } from "@/stores/ParentsAuth/services";
 
 const WEEKDAY: Record<string, number> = {
@@ -98,11 +99,12 @@ const SESSION_STATUS: Record<string, string> = {
 interface Props {
   session: any;
   locations: Record<string, any>;
+  parent: { name: string; email: string } | null;
   onDone: () => void;
   onCancel: () => void;
 }
 
-export function RescheduleWizard({ session, locations, onDone, onCancel }: Props) {
+export function RescheduleWizard({ session, locations, parent, onDone, onCancel }: Props) {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -185,6 +187,22 @@ export function RescheduleWizard({ session, locations, onDone, onCancel }: Props
         scheduleId: selDate.scheduleId,
         locationId: selLocation.id,
       });
+      // Email de confirmación al apoderado (no bloquea el éxito del reagendamiento)
+      if (parent?.email) {
+        try {
+          await sendRescheduleEmail({
+            email: parent.email,
+            name: parent.name,
+            oldDate: formatLongDate(session?.date),
+            newDate: selDate.dateLabel,
+            newTime: selDate.timeLabel,
+            sede: selLocation.name,
+            curso: selCourse.title,
+          });
+        } catch (mailErr) {
+          console.error("reschedule email error", mailErr);
+        }
+      }
       onDone();
     } catch (e) {
       console.error("reschedule error", e);
