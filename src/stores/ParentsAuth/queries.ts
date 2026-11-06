@@ -103,6 +103,9 @@ export const listLocations = /* GraphQL */ `
         name
         city
         address
+        group
+        isActive
+        isVisible
       }
     }
   }

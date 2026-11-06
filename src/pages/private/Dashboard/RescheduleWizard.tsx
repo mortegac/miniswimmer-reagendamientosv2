@@ -65,10 +65,17 @@ export function RescheduleWizard({ session, locations, onDone, onCancel }: Props
   const [selDate, setSelDate] = useState<DateOption | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const locationList = useMemo(
-    () => Object.values(locations).sort((a: any, b: any) => (a.name > b.name ? 1 : -1)),
-    [locations]
-  );
+  // Solo sedes visibles y activas, agrupadas por "group"
+  const locationGroups = useMemo(() => {
+    const visible = Object.values(locations).filter(
+      (l: any) => l.isActive === true && l.isVisible === true
+    );
+    const groups: Record<string, any[]> = {};
+    for (const l of visible) (groups[l.group || "OTRAS"] ??= []).push(l);
+    return Object.entries(groups)
+      .map(([group, items]) => [group, items.sort((a: any, b: any) => (a.name > b.name ? 1 : -1))] as [string, any[]])
+      .sort((a, b) => (a[0] > b[0] ? 1 : -1));
+  }, [locations]);
 
   const pickLocation = async (loc: any) => {
     setSelLocation(loc);
@@ -166,12 +173,19 @@ export function RescheduleWizard({ session, locations, onDone, onCancel }: Props
       )}
 
       {!loading && step === 1 && (
-        <div className="space-y-2 overflow-y-auto">
-          {locationList.map((loc: any) => (
-            <button key={loc.id} type="button" onClick={() => pickLocation(loc)} className={optionClass(selLocation?.id === loc.id)}>
-              <p className="text-slate-700 font-medium text-sm">{loc.name}</p>
-              {loc.address && <p className="text-slate-400 text-xs mt-0.5">{loc.address}</p>}
-            </button>
+        <div className="space-y-4 overflow-y-auto">
+          {locationGroups.map(([group, items]) => (
+            <div key={group}>
+              <p className="text-[11px] font-semibold tracking-widest uppercase text-slate-400 mb-2">{group}</p>
+              <div className="space-y-2">
+                {items.map((loc: any) => (
+                  <button key={loc.id} type="button" onClick={() => pickLocation(loc)} className={optionClass(selLocation?.id === loc.id)}>
+                    <p className="text-slate-700 font-medium text-sm">{loc.name}</p>
+                    {loc.address && <p className="text-slate-400 text-xs mt-0.5">{loc.address}</p>}
+                  </button>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       )}
