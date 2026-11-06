@@ -111,58 +111,52 @@ function Dashboard() {
             if (!student) return null;
             const enrollments = student?.enrollments?.items || [];
             return (
-              <div key={rel.id} className="mt-8">
+              <div key={rel.id} className="box mt-6 p-5 sm:p-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center">
-                    <Lucide icon="User" className="w-5 h-5 text-white" />
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Lucide icon="User" className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-medium capitalize text-white">
+                    <h2 className="text-lg font-medium capitalize text-slate-700">
                       {student.name} {student.lastName}
                     </h2>
-                    <p className="text-white/60 text-sm">{RELATION_LABEL[rel.relationType] ?? rel.relationType}</p>
+                    <p className="text-slate-400 text-sm">{RELATION_LABEL[rel.relationType] ?? rel.relationType}</p>
                   </div>
                 </div>
 
                 {enrollments.every((e: any) => (e?.sessionDetails?.items || []).filter(isUpcoming).length === 0) && (
-                  <p className="text-white/50 mt-3">Sin sesiones próximas</p>
+                  <p className="text-slate-400 mt-3">Sin sesiones próximas</p>
                 )}
 
                 {enrollments.map((enr: any) => {
                   const sessions = (enr?.sessionDetails?.items || []).filter(isUpcoming);
                   if (sessions.length === 0) return null;
                   return (
-                    <div key={enr.id} className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div key={enr.id} className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {[...sessions]
                         .sort((a: any, b: any) => (a.date > b.date ? 1 : -1))
                         .map((s: any) => (
-                          <div key={s.id} className="bg-white rounded-xl overflow-hidden shadow-md shadow-black/5">
-                            {/* Header: DÍA-HORA | CURSO */}
-                            <div className="flex items-center justify-between gap-2 bg-slate-800 text-white px-4 py-2">
-                              <span className="font-bold tracking-wider uppercase text-xs whitespace-nowrap">
-                                {(DAYS[s.schedule?.day?.toLowerCase()] || s.schedule?.day || "—")}-{s.schedule?.startHour || "—"}
-                              </span>
-                              <span className="font-bold tracking-wider uppercase text-xs text-right truncate">
-                                {s.course?.title || enr.course?.title || "Curso"}
+                          <div key={s.id} className="bg-white rounded-xl border border-slate-200/80 shadow-[0px_3px_5px_#0000000b] p-4">
+                            <p className="text-slate-700 font-medium text-sm truncate">
+                              {s.course?.title || enr.course?.title || "Curso"}
+                            </p>
+                            <p className="text-slate-400 text-xs mt-0.5 capitalize">
+                              {(DAYS[s.schedule?.day?.toLowerCase()] || s.schedule?.day || "—")} · {s.schedule?.startHour || "—"} hrs
+                            </p>
+                            <div className="flex items-center gap-2 mt-3">
+                              <Lucide icon="Calendar" className="w-4 h-4 text-primary shrink-0" />
+                              <span className="text-slate-600 text-sm font-medium whitespace-nowrap">{formatShortDate(s.date)}</span>
+                              <span className="ml-auto bg-slate-100 border border-slate-200 text-slate-500 text-[11px] rounded-md px-2 py-0.5 whitespace-nowrap">
+                                {STATUS_LABEL[s.status] || s.status}
                               </span>
                             </div>
-                            {/* Body compacto: fecha + estado + acción */}
-                            <div className="px-4 py-3">
-                              <div className="flex items-center gap-2 min-w-0">
-                                <Lucide icon="Calendar" className="w-4 h-4 text-primary shrink-0" />
-                                <span className="text-slate-700 font-medium whitespace-nowrap">{formatShortDate(s.date)}</span>
-                                <span className="ml-auto bg-slate-100 text-slate-500 text-[11px] font-medium tracking-wide rounded-full px-3 py-1 whitespace-nowrap">
-                                  {STATUS_LABEL[s.status] || s.status}
-                                </span>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => setSelectedSession({ ...s, studentName: `${student.name} ${student.lastName}` })}
-                                className="mt-3 w-full bg-primary/80 hover:bg-primary transition-colors text-white rounded-full font-semibold tracking-wider uppercase text-xs px-5 py-2.5"
-                              >
-                                Reagendar
-                              </button>
-                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setSelectedSession({ ...s, studentName: `${student.name} ${student.lastName}` })}
+                              className="mt-4 w-full bg-primary/80 hover:bg-primary transition-colors text-white rounded-full font-medium text-sm px-5 py-2.5"
+                            >
+                              Reagendar
+                            </button>
                           </div>
                         ))}
                     </div>
