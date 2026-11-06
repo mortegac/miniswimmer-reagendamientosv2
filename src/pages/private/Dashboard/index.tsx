@@ -57,6 +57,7 @@ function Dashboard() {
     useAppSelector(selectParentsAuth);
 
   const [selectedSession, setSelectedSession] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState(0);
 
   useEffect(() => {
     if (!authorized || !parent) {
@@ -107,30 +108,54 @@ function Dashboard() {
           <p className="text-red-500 mt-6">{errorMessage}</p>
         )}
 
-        {!isLoading &&
-          relationships.map((rel: any) => {
-            const student = rel?.student;
-            if (!student) return null;
-            const enrollments = student?.enrollments?.items || [];
-            return (
-              <div key={rel.id} className="box mt-6 p-5 sm:p-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Lucide icon="User" className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-medium capitalize text-slate-700">
-                      {student.name} {student.lastName}
-                    </h2>
-                    <p className="text-slate-400 text-sm">{RELATION_LABEL[rel.relationType] ?? rel.relationType}</p>
-                  </div>
-                </div>
+        {!isLoading && relationships.length > 0 && (
+          <div className="box mt-6 p-5 sm:p-6">
+            {/* Tabs: un alumno por tab */}
+            <div className="flex gap-1 border-b border-slate-200 overflow-x-auto">
+              {relationships.map((rel: any, i: number) => {
+                const st = rel?.student;
+                if (!st) return null;
+                const active = i === activeTab;
+                return (
+                  <button
+                    key={rel.id}
+                    type="button"
+                    onClick={() => setActiveTab(i)}
+                    className={`px-4 py-2.5 text-sm font-medium capitalize whitespace-nowrap border-b-2 -mb-px transition-colors ${
+                      active
+                        ? "border-primary text-primary"
+                        : "border-transparent text-slate-400 hover:text-slate-600"
+                    }`}
+                  >
+                    {st.name} {st.lastName}
+                  </button>
+                );
+              })}
+            </div>
 
-                {enrollments.every((e: any) => (e?.sessionDetails?.items || []).filter(isUpcoming).length === 0) && (
-                  <p className="text-slate-400 mt-3">Sin sesiones próximas</p>
-                )}
+            {[relationships[Math.min(activeTab, relationships.length - 1)]].map((rel: any) => {
+              const student = rel?.student;
+              if (!student) return null;
+              const enrollments = student?.enrollments?.items || [];
+              return (
+                <div key={rel.id} className="mt-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Lucide icon="User" className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-medium capitalize text-slate-700">
+                        {student.name} {student.lastName}
+                      </h2>
+                      <p className="text-slate-400 text-sm">{RELATION_LABEL[rel.relationType] ?? rel.relationType}</p>
+                    </div>
+                  </div>
 
-                {enrollments.map((enr: any) => {
+                  {enrollments.every((e: any) => (e?.sessionDetails?.items || []).filter(isUpcoming).length === 0) && (
+                    <p className="text-slate-400 mt-3">Sin sesiones próximas</p>
+                  )}
+
+                  {enrollments.map((enr: any) => {
                   const sessions = (enr?.sessionDetails?.items || []).filter(isUpcoming);
                   if (sessions.length === 0) return null;
                   return (
@@ -187,9 +212,11 @@ function Dashboard() {
                     </div>
                   );
                 })}
-              </div>
-            );
-          })}
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {!isLoading && relationships.length === 0 && !errorMessage && (
           <div className="rounded-xl bg-white/10 ring-1 ring-white/15 p-8 mt-6 text-center text-white/70">
