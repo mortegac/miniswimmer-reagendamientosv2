@@ -23,22 +23,12 @@ const formatDate = (iso: string) => {
   return d.toLocaleDateString("es-CL", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 };
 
+const MONTHS = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+// "14 Nov 2026"
 const formatShortDate = (iso: string) => {
   if (!iso) return "—";
   const [y, m, d] = iso.slice(0, 10).split("-");
-  return `${d}-${m}-${y}`;
-};
-
-// "X años, Y meses" desde birthdate ISO
-const formatAge = (birthdate?: string) => {
-  if (!birthdate) return "";
-  const b = new Date(birthdate);
-  const now = new Date();
-  let months = (now.getFullYear() - b.getFullYear()) * 12 + (now.getMonth() - b.getMonth());
-  if (now.getDate() < b.getDate()) months--;
-  const years = Math.floor(months / 12);
-  const rest = months % 12;
-  return `${years} años${rest > 0 ? `, ${rest} meses` : ""}`;
+  return `${Number(d)} ${MONTHS[Number(m) - 1] ?? ""} ${y}`;
 };
 
 const STATUS_LABEL: Record<string, string> = {
@@ -107,7 +97,7 @@ function Dashboard() {
 
         {isLoading && (
           <div className="flex justify-center py-20">
-            <LoadingIcon color="#7E4996" icon="oval" className="w-10 h-10" />
+            <LoadingIcon color="#FFFFFF" icon="oval" className="w-10 h-10" />
           </div>
         )}
 
@@ -121,67 +111,56 @@ function Dashboard() {
             if (!student) return null;
             const enrollments = student?.enrollments?.items || [];
             return (
-              <div key={rel.id} className="box p-6 mt-6">
+              <div key={rel.id} className="mt-8">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Lucide icon="User" className="w-5 h-5 text-primary" />
+                  <div className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center">
+                    <Lucide icon="User" className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-medium capitalize">
+                    <h2 className="text-lg font-medium capitalize text-white">
                       {student.name} {student.lastName}
                     </h2>
-                    <p className="text-slate-400 text-sm">{RELATION_LABEL[rel.relationType] ?? rel.relationType}</p>
+                    <p className="text-white/60 text-sm">{RELATION_LABEL[rel.relationType] ?? rel.relationType}</p>
                   </div>
                 </div>
 
                 {enrollments.every((e: any) => (e?.sessionDetails?.items || []).filter(isUpcoming).length === 0) && (
-                  <p className="text-slate-400 mt-4">Sin sesiones próximas</p>
+                  <p className="text-white/50 mt-3">Sin sesiones próximas</p>
                 )}
 
                 {enrollments.map((enr: any) => {
                   const sessions = (enr?.sessionDetails?.items || []).filter(isUpcoming);
                   if (sessions.length === 0) return null;
                   return (
-                    <div key={enr.id} className="mt-5 space-y-5">
+                    <div key={enr.id} className="mt-3 space-y-3">
                       {[...sessions]
                         .sort((a: any, b: any) => (a.date > b.date ? 1 : -1))
                         .map((s: any) => (
-                          <div key={s.id} className="rounded-xl overflow-hidden shadow-sm bg-slate-200/60 p-1.5">
+                          <div key={s.id} className="rounded-xl overflow-hidden shadow-lg shadow-black/10 ring-1 ring-white/15">
                             {/* Header: DÍA-HORA | CURSO */}
-                            <div className="flex items-center justify-between bg-slate-800 text-white rounded-lg px-4 py-2.5">
-                              <span className="font-bold tracking-wide uppercase text-sm sm:text-base">
+                            <div className="flex items-center justify-between gap-2 bg-slate-900/80 text-white px-4 py-2">
+                              <span className="font-bold tracking-wider uppercase text-xs sm:text-sm whitespace-nowrap">
                                 {(DAYS[s.schedule?.day?.toLowerCase()] || s.schedule?.day || "—")}-{s.schedule?.startHour || "—"}
                               </span>
-                              <span className="font-bold tracking-wide uppercase text-sm sm:text-base text-right">
+                              <span className="font-bold tracking-wider uppercase text-xs sm:text-sm text-right truncate">
                                 {s.course?.title || enr.course?.title || "Curso"}
                               </span>
                             </div>
-                            {/* Body */}
-                            <div className="flex mt-1.5 gap-1.5">
-                              <div className="flex-1 bg-white rounded-lg p-5">
-                                <h3 className="text-xl font-medium capitalize">
-                                  {student.name} {student.lastName}
-                                </h3>
-                                <p className="text-slate-500 text-sm mt-1">{formatAge(student.birthdate)}</p>
-                                <div className="flex items-center gap-4 mt-4">
-                                  <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                                    <Lucide icon="User" className="w-7 h-7 text-primary" />
-                                  </div>
-                                  <div>
-                                    <span className="inline-block bg-slate-300/70 text-slate-700 text-xs font-medium tracking-wide rounded-full px-4 py-1.5">
-                                      {STATUS_LABEL[s.status] || s.status}
-                                    </span>
-                                    <p className="text-slate-500 text-sm mt-2">{formatShortDate(s.date)}</p>
-                                  </div>
-                                </div>
+                            {/* Body compacto: fecha + estado + acción */}
+                            <div className="flex items-center justify-between gap-3 bg-white/10 backdrop-blur-sm px-4 py-2.5">
+                              <div className="flex items-center gap-3 min-w-0">
+                                <Lucide icon="Calendar" className="w-4 h-4 text-white/70 shrink-0" />
+                                <span className="text-white font-medium whitespace-nowrap">{formatShortDate(s.date)}</span>
+                                <span className="hidden sm:inline-block bg-white/15 text-white/90 text-[11px] font-medium tracking-wide rounded-full px-3 py-1">
+                                  {STATUS_LABEL[s.status] || s.status}
+                                </span>
                               </div>
-                              {/* Acción */}
                               <button
                                 type="button"
                                 onClick={() => setSelectedSession({ ...s, studentName: `${student.name} ${student.lastName}` })}
-                                className="w-28 sm:w-32 bg-primary/70 hover:bg-primary transition-colors rounded-lg flex items-center justify-center text-white font-medium tracking-widest uppercase text-sm text-center px-2"
+                                className="shrink-0 bg-white text-primary hover:bg-white/90 transition-colors rounded-full font-semibold tracking-wider uppercase text-xs px-5 py-2"
                               >
-                                Ver detalle
+                                Reagendar
                               </button>
                             </div>
                           </div>
@@ -194,7 +173,7 @@ function Dashboard() {
           })}
 
         {!isLoading && relationships.length === 0 && !errorMessage && (
-          <div className="box p-8 mt-6 text-center text-slate-400">
+          <div className="rounded-xl bg-white/10 ring-1 ring-white/15 p-8 mt-6 text-center text-white/70">
             No encontramos estudiantes asociados a tu cuenta
           </div>
         )}

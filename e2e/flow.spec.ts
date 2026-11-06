@@ -48,7 +48,7 @@ test("flujo completo: email → código → dashboard → slideover de sesión",
   await expect(page.getByText("Gonzalez Concha", { exact: false }).first()).toBeVisible({ timeout: 15000 });
 
   // Paso 4: seleccionar una sesión → slideover con el detalle
-  await page.getByRole("button", { name: "Ver detalle" }).first().click();
+  await page.getByRole("button", { name: "Reagendar" }).first().click();
   await expect(page.getByText("Detalle de la sesión")).toBeVisible();
   await expect(page.getByText("Sede")).toBeVisible();
   await expect(page.getByText("Curso")).toBeVisible();
