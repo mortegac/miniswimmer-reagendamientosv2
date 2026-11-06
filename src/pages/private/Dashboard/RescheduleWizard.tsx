@@ -18,8 +18,9 @@ const normalizeDay = (d?: string) =>
   (d || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 
 type DateOption = {
-  iso: string;       // 2026-11-15
-  label: string;     // Sábado 15 Nov · 10:30 - 11:15
+  iso: string;        // 2026-11-15
+  dateLabel: string;  // Sábado 15 Nov
+  timeLabel: string;  // 10:30 - 11:15
   scheduleId: string;
 };
 
@@ -37,12 +38,17 @@ function buildDateOptions(schedules: any[]): DateOption[] {
       opts.push({
         iso,
         scheduleId: sch.id,
-        label: `${DAY_NAME[dow]} ${d.getDate()} ${MONTHS[d.getMonth()]} · ${sch.startHour} - ${sch.endHour}`,
+        dateLabel: `${DAY_NAME[dow]} ${d.getDate()} ${MONTHS[d.getMonth()]}`,
+        timeLabel: `${sch.startHour} - ${sch.endHour}`,
       });
     }
   }
-  return opts.sort((a, b) => (a.iso + a.label > b.iso + b.label ? 1 : -1));
+  return opts.sort((a, b) => (a.iso + a.timeLabel > b.iso + b.timeLabel ? 1 : -1));
 }
+
+// Comparación laxa de títulos de curso (ignora mayúsculas, acentos y símbolos)
+const normTitle = (t?: string) =>
+  (t || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]/g, "");
 
 const STEPS = ["Sede", "Curso", "Fecha"];
 
@@ -104,8 +110,21 @@ export function RescheduleWizard({ session, locations, onDone, onCancel }: Props
     setError("");
     setLoading(true);
     try {
-      setCourses(await fetchCoursesByLocation(loc.id));
+      const all = await fetchCoursesByLocation(loc.id);
+      // Solo el curso asociado a la sesión que se reagenda (por id o título equivalente)
+      const target = normTitle(session?.course?.title);
+      const matched = all.filter(
+        (c: any) => c.id === session?.courseId || (target && normTitle(c.title) === target)
+      );
+      const visible = matched.length > 0 ? matched : all;
+      // Pre-cargar los horarios de cada curso para mostrarlos en la card
+      const withSchedules = await Promise.all(
+        visible.map(async (c: any) => ({ ...c, schedules: await fetchSchedulesByCourse(c.id) }))
+      );
+      setCourses(withSchedules);
       setStep(2);
+      if (matched.length === 0 && all.length > 0)
+        setError("Esta sede no tiene el curso de la sesión; se muestran todos los cursos");
     } catch {
       setError("No se pudieron cargar los cursos");
     } finally {
@@ -113,22 +132,14 @@ export function RescheduleWizard({ session, locations, onDone, onCancel }: Props
     }
   };
 
-  const pickCourse = async (course: any) => {
+  const pickCourse = (course: any) => {
     setSelCourse(course);
     setSelDate(null);
     setError("");
-    setLoading(true);
-    try {
-      const schedules = await fetchSchedulesByCourse(course.id);
-      const opts = buildDateOptions(schedules);
-      setDateOptions(opts);
-      setStep(3);
-      if (opts.length === 0) setError("Este curso no tiene fechas disponibles en los próximos 15 días");
-    } catch {
-      setError("No se pudieron cargar los horarios");
-    } finally {
-      setLoading(false);
-    }
+    const opts = buildDateOptions(course.schedules || []);
+    setDateOptions(opts);
+    setStep(3);
+    if (opts.length === 0) setError("Este curso no tiene fechas disponibles en los próximos 15 días");
   };
 
   const finish = async () => {
@@ -238,23 +249,40 @@ export function RescheduleWizard({ session, locations, onDone, onCancel }: Props
             <button key={c.id} type="button" onClick={() => pickCourse(c)} className={optionClass(selCourse?.id === c.id)}>
               <p className="text-slate-700 font-medium text-sm">{c.title}</p>
               {c.description && <p className="text-slate-400 text-xs mt-0.5">{c.description}</p>}
+              {(c.schedules || []).length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {c.schedules.map((sch: any) => (
+                    <span key={sch.id} className="bg-slate-100 border border-slate-200 text-slate-500 text-[11px] rounded-full px-2.5 py-0.5 capitalize">
+                      {sch.day} {sch.startHour} - {sch.endHour}
+                    </span>
+                  ))}
+                </div>
+              )}
             </button>
           ))}
         </div>
       )}
 
       {!loading && step === 3 && (
-        <div className="space-y-2 overflow-y-auto">
-          {dateOptions.map((opt) => (
-            <button
-              key={`${opt.iso}-${opt.scheduleId}-${opt.label}`}
-              type="button"
-              onClick={() => setSelDate(opt)}
-              className={optionClass(selDate?.iso === opt.iso && selDate?.scheduleId === opt.scheduleId && selDate?.label === opt.label)}
-            >
-              <p className="text-slate-700 font-medium text-sm">{opt.label}</p>
-            </button>
-          ))}
+        <div className="grid grid-cols-2 gap-2 overflow-y-auto content-start">
+          {dateOptions.map((opt) => {
+            const active = selDate?.iso === opt.iso && selDate?.scheduleId === opt.scheduleId && selDate?.timeLabel === opt.timeLabel;
+            return (
+              <button
+                key={`${opt.iso}-${opt.scheduleId}-${opt.timeLabel}`}
+                type="button"
+                onClick={() => setSelDate(opt)}
+                className={`flex flex-col items-center justify-center text-center px-3 py-4 rounded-xl border transition-colors ${
+                  active
+                    ? "border-primary bg-primary/5 ring-1 ring-primary"
+                    : "border-slate-200 hover:border-primary/50 hover:bg-slate-50"
+                }`}
+              >
+                <p className="text-slate-700 font-semibold text-base leading-tight">{opt.dateLabel}</p>
+                <p className="text-slate-400 text-xs mt-1">{opt.timeLabel}</p>
+              </button>
+            );
+          })}
         </div>
       )}
 
