@@ -1,8 +1,8 @@
 import { generateClient } from "aws-amplify/api";
 import emailjs, { init } from "emailjs-com";
 
-import { getParentUser, parentsAuthorizationsByCode, relationshipsByUserId, listLocations } from "./queries";
-import { createParentsAuthorization, updateParentsAuthorization } from "./mutations";
+import { getParentUser, parentsAuthorizationsByCode, relationshipsByUserId, listLocations, coursesByLocation, schedulesByCourse } from "./queries";
+import { createParentsAuthorization, updateParentsAuthorization, updateSessionDetail } from "./mutations";
 
 // Configuración EmailJS — template dedicado de reagendamientos (contenido en html_content)
 const EMAILJS_SERVICE = "service_ucb8wga";
@@ -95,4 +95,55 @@ export const fetchLocations = async (): Promise<Record<string, any>> => {
   const map: Record<string, any> = {};
   for (const l of res?.data?.listV2Locations?.items || []) map[l.id] = l;
   return map;
+};
+
+// ─── Wizard de reagendamiento ───────────────────────────────────────────────
+
+export const fetchCoursesByLocation = async (locationId: string): Promise<any[]> => {
+  const res: any = await client.graphql({
+    query: coursesByLocation,
+    variables: { filter: { locationId: { eq: locationId }, isActive: { eq: true } }, limit: 500 },
+    authMode: "apiKey",
+  });
+  return res?.data?.listV2Courses?.items || [];
+};
+
+export const fetchSchedulesByCourse = async (courseId: string): Promise<any[]> => {
+  const res: any = await client.graphql({
+    query: schedulesByCourse,
+    variables: { courseSchedulesId: courseId, limit: 200 },
+    authMode: "apiKey",
+  });
+  return (res?.data?.schedulesByCourse?.items || []).filter((s: any) => s.isActive);
+};
+
+export const rescheduleSessionDetail = async (input: {
+  id: string;
+  date: string;
+  day: string;
+  month: string;
+  year: string;
+  courseId: string;
+  scheduleId: string;
+  locationId: string;
+}): Promise<any> => {
+  const res: any = await client.graphql({
+    query: updateSessionDetail,
+    variables: {
+      input: {
+        id: input.id,
+        date: input.date,
+        day: input.day,
+        month: input.month,
+        year: input.year,
+        courseId: input.courseId,
+        scheduleId: input.scheduleId,
+        locationId: input.locationId,
+        locationIdUsed: input.locationId,
+        status: "RECOVERED",
+      },
+    },
+    authMode: "apiKey",
+  });
+  return res?.data?.updateV2SessionDetail || null;
 };

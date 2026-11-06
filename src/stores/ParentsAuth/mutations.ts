@@ -20,3 +20,16 @@ export const updateParentsAuthorization = /* GraphQL */ `
     }
   }
 `;
+
+export const updateSessionDetail = /* GraphQL */ `
+  mutation UpdateV2SessionDetail($input: UpdateV2SessionDetailInput!) {
+    updateV2SessionDetail(input: $input) {
+      id
+      date
+      status
+      courseId
+      scheduleId
+      locationId
+    }
+  }
+`;

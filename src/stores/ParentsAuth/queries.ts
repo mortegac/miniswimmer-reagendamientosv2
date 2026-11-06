@@ -62,7 +62,7 @@ export const relationshipsByUserId = /* GraphQL */ `
                 title
                 description
               }
-              sessionDetails(filter: { status: { eq: ACTIVE } }, limit: 1000) {
+              sessionDetails(filter: { or: [{ status: { eq: ACTIVE } }, { status: { eq: RECOVERED } }] }, limit: 1000) {
                 items {
                   id
                   date
@@ -103,6 +103,36 @@ export const listLocations = /* GraphQL */ `
         name
         city
         address
+      }
+    }
+  }
+`;
+
+export const coursesByLocation = /* GraphQL */ `
+  query ListV2Courses($filter: ModelV2CourseFilterInput, $limit: Int) {
+    listV2Courses(filter: $filter, limit: $limit) {
+      items {
+        id
+        title
+        description
+        isActive
+        locationId
+      }
+    }
+  }
+`;
+
+export const schedulesByCourse = /* GraphQL */ `
+  query SchedulesByCourse($courseSchedulesId: ID!, $limit: Int) {
+    schedulesByCourse(courseSchedulesId: $courseSchedulesId, limit: $limit) {
+      items {
+        id
+        day
+        startHour
+        endHour
+        isActive
+        locationSchedulesId
+        courseSchedulesId
       }
     }
   }
