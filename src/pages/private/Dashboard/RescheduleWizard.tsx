@@ -50,6 +50,29 @@ function buildDateOptions(schedules: any[]): DateOption[] {
 const normTitle = (t?: string) =>
   (t || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]/g, "");
 
+// Rango etario del curso normalizado a meses ([inicio, fin])
+const ageRangeMonths = (c: any): [number, number] => {
+  const s = Number(c?.startingAge ?? 0);
+  const e = Number(c?.endingAge ?? 100);
+  if (c?.ageType === "MONTHS") return [s, e];
+  if (c?.ageType === "YEARS") return [s * 12, e * 12];
+  return [0, 1200]; // ALL: cualquier edad
+};
+
+const rangesOverlap = (a: [number, number], b: [number, number]) => a[0] <= b[1] && a[1] >= b[0];
+
+// Cursos excluidos del reagendamiento
+const isExcludedCourse = (title?: string) => {
+  const t = (title || "").trim().toUpperCase();
+  return t.includes("PERSONALIZADO") || t.startsWith("INTENSIVO");
+};
+
+const ageLabel = (c: any) => {
+  if (!c?.ageType || c.ageType === "ALL") return "";
+  const unit = c.ageType === "MONTHS" ? "meses" : "años";
+  return `${c.startingAge} a ${c.endingAge} ${unit}`;
+};
+
 const STEPS = ["Sede", "Curso", "Fecha"];
 
 const FULL_DAYS: Record<string, string> = {
@@ -110,21 +133,25 @@ export function RescheduleWizard({ session, locations, onDone, onCancel }: Props
     setError("");
     setLoading(true);
     try {
-      const all = await fetchCoursesByLocation(loc.id);
+      // Excluir cursos PERSONALIZADO / INTENSIVO*
+      const all = (await fetchCoursesByLocation(loc.id)).filter((c: any) => !isExcludedCourse(c.title));
       // Solo el curso asociado a la sesión que se reagenda (por id o título equivalente)
       const target = normTitle(session?.course?.title);
       const matched = all.filter(
         (c: any) => c.id === session?.courseId || (target && normTitle(c.title) === target)
       );
-      const visible = matched.length > 0 ? matched : all;
+      // Fallback: cursos cuyo rango etario se solapa con el del curso de la sesión
+      const sessionRange = ageRangeMonths(session?.course);
+      const ageCompatible = all.filter((c: any) => rangesOverlap(ageRangeMonths(c), sessionRange));
+      const visible = matched.length > 0 ? matched : ageCompatible;
       // Pre-cargar los horarios de cada curso para mostrarlos en la card
       const withSchedules = await Promise.all(
         visible.map(async (c: any) => ({ ...c, schedules: await fetchSchedulesByCourse(c.id) }))
       );
       setCourses(withSchedules);
       setStep(2);
-      if (matched.length === 0 && all.length > 0)
-        setError("Esta sede no tiene el curso de la sesión; se muestran todos los cursos");
+      if (matched.length === 0 && ageCompatible.length === 0)
+        setError("Esta sede no tiene cursos compatibles con la edad del alumno");
     } catch {
       setError("No se pudieron cargar los cursos");
     } finally {
@@ -248,7 +275,7 @@ export function RescheduleWizard({ session, locations, onDone, onCancel }: Props
           {courses.map((c: any) => (
             <button key={c.id} type="button" onClick={() => pickCourse(c)} className={optionClass(selCourse?.id === c.id)}>
               <p className="text-slate-700 font-medium text-sm">{c.title}</p>
-              {c.description && <p className="text-slate-400 text-xs mt-0.5">{c.description}</p>}
+              {ageLabel(c) && <p className="text-slate-400 text-xs mt-0.5">{ageLabel(c)}</p>}
               {(c.schedules || []).length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mt-2">
                   {c.schedules.map((sch: any) => (

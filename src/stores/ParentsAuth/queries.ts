@@ -78,6 +78,9 @@ export const relationshipsByUserId = /* GraphQL */ `
                   course {
                     id
                     title
+                    startingAge
+                    endingAge
+                    ageType
                   }
                   schedule {
                     id
@@ -120,6 +123,10 @@ export const coursesByLocation = /* GraphQL */ `
         description
         isActive
         locationId
+        startingAge
+        endingAge
+        ageType
+        ageGroupType
       }
     }
   }
