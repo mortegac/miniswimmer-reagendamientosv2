@@ -46,6 +46,26 @@ function buildDateOptions(schedules: any[]): DateOption[] {
 
 const STEPS = ["Sede", "Curso", "Fecha"];
 
+const FULL_DAYS: Record<string, string> = {
+  monday: "Lunes", tuesday: "Martes", wednesday: "Miércoles", thursday: "Jueves",
+  friday: "Viernes", saturday: "Sábado", sunday: "Domingo",
+  lunes: "Lunes", martes: "Martes", miercoles: "Miércoles", jueves: "Jueves",
+  viernes: "Viernes", sabado: "Sábado", domingo: "Domingo",
+};
+
+const formatLongDate = (iso: string) => {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString("es-CL", {
+    weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC",
+  });
+};
+
+const SESSION_STATUS: Record<string, string> = {
+  ACTIVE: "SESIÓN VIGENTE",
+  RECOVERED: "SESIÓN RECUPERADA",
+  USED: "SESIÓN UTILIZADA",
+};
+
 interface Props {
   session: any;
   locations: Record<string, any>;
@@ -142,8 +162,32 @@ export function RescheduleWizard({ session, locations, onDone, onCancel }: Props
         : "border-slate-200 hover:border-primary/50 hover:bg-slate-50"
     }`;
 
+  const sessionLocation = locations[session?.locationId];
+
   return (
     <div className="flex flex-col h-full">
+      {/* Resumen de la sesión a reagendar (solo en el paso 1) */}
+      {step === 1 && (
+        <div className="divide-y divide-slate-100 text-sm border-b border-slate-100 mb-4 pb-2">
+          {[
+            ["Estudiante", <span className="capitalize">{session?.studentName}</span>],
+            ["Fecha", <span className="capitalize">{formatLongDate(session?.date)}</span>],
+            ["Sede", sessionLocation?.name || session?.locationId],
+            ["Curso", session?.course?.title || session?.courseId],
+            ["Horario", session?.schedule
+              ? `${FULL_DAYS[session.schedule.day?.toLowerCase()] || session.schedule.day} ${session.schedule.startHour} - ${session.schedule.endHour}`
+              : "—"],
+            ["Sesión", `${session?.sessionNumber ?? "—"} de ${session?.totalSessions ?? "—"}`],
+            ["Estado", SESSION_STATUS[session?.status] || session?.status],
+          ].map(([label, value]) => (
+            <div key={label as string} className="py-2 flex items-start justify-between gap-4">
+              <span className="text-slate-400 shrink-0">{label}</span>
+              <span className="text-slate-700 font-medium text-right">{value}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Indicador de pasos */}
       <div className="flex items-center gap-2 mb-5">
         {STEPS.map((label, i) => {

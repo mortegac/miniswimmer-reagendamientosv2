@@ -47,16 +47,12 @@ test("flujo completo: email → código → dashboard → slideover de sesión",
   await expect(page.getByText("Sesiones activas")).toBeVisible();
   await expect(page.getByText("Gonzalez Concha", { exact: false }).first()).toBeVisible({ timeout: 15000 });
 
-  // Paso 4: seleccionar una sesión → slideover con el detalle compacto
+  // Paso 4: seleccionar una sesión → wizard directo con resumen en el paso 1
   await page.getByRole("button", { name: "Reagendar" }).first().click();
-  await expect(page.getByText("Detalle de la sesión")).toBeVisible();
-  await expect(page.getByText("Sede")).toBeVisible();
-  await expect(page.getByText("Horario")).toBeVisible();
-
-  // Paso 5: abrir wizard de reagendamiento y navegar los 3 pasos
   const panel = page.locator('[role="dialog"]');
-  await panel.getByRole("button", { name: "Reagendar" }).click();
   await expect(page.getByText("Reagendar sesión")).toBeVisible();
+  await expect(panel.getByText("Estudiante")).toBeVisible();
+  await expect(panel.getByText("Horario")).toBeVisible();
 
   // Paso 1: sede
   await panel.locator("button.w-full.text-left").first().click();
@@ -67,9 +63,7 @@ test("flujo completo: email → código → dashboard → slideover de sesión",
   // Paso 3: fechas (máx 15 días)
   await expect(panel.getByRole("button", { name: "Finalizar" })).toBeVisible({ timeout: 20000 });
 
-  // Cancelar sin guardar
+  // Cancelar cierra la ventana
   await panel.getByRole("button", { name: "Cancelar" }).click();
-  await expect(page.getByText("Detalle de la sesión")).toBeVisible();
-  await page.getByRole("button", { name: "Cerrar" }).click();
-  await expect(page.getByText("Detalle de la sesión")).not.toBeVisible();
+  await expect(page.getByText("Reagendar sesión")).not.toBeVisible();
 });

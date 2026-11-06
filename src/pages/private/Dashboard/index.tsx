@@ -18,12 +18,6 @@ const DAYS: Record<string, string> = {
   viernes: "Viernes", sabado: "Sábado", domingo: "Domingo",
 };
 
-const formatDate = (iso: string) => {
-  if (!iso) return "—";
-  const d = new Date(iso);
-  return d.toLocaleDateString("es-CL", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
-};
-
 const MONTHS = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
 // "14 Nov 2026"
 const formatShortDate = (iso: string) => {
@@ -63,7 +57,6 @@ function Dashboard() {
     useAppSelector(selectParentsAuth);
 
   const [selectedSession, setSelectedSession] = useState<any>(null);
-  const [wizardOpen, setWizardOpen] = useState(false);
 
   useEffect(() => {
     if (!authorized || !parent) {
@@ -73,10 +66,7 @@ function Dashboard() {
     dispatch(loadDashboard(parent.id));
   }, []);
 
-  const closeSlideover = () => {
-    setSelectedSession(null);
-    setWizardOpen(false);
-  };
+  const closeSlideover = () => setSelectedSession(null);
 
   // Reagendamiento exitoso: cerrar ventana y refrescar sesiones
   const handleRescheduled = () => {
@@ -90,7 +80,6 @@ function Dashboard() {
   };
 
   const isLoading = status === "loading";
-  const location = selectedSession ? locations[selectedSession.locationId] : null;
 
   return (
     <div className="grid grid-cols-12 gap-y-6 gap-x-6 mt-4">
@@ -209,65 +198,20 @@ function Dashboard() {
         )}
       </div>
 
-      {/* Slideover: detalle de la sesión / wizard de reagendamiento */}
+      {/* Slideover: wizard de reagendamiento (incluye el resumen de la sesión en el paso 1) */}
       <Slideover open={!!selectedSession} onClose={closeSlideover}>
         <Slideover.Panel className="w-96">
           <Slideover.Title className="p-5">
-            <h2 className="mr-auto text-base font-medium">
-              {wizardOpen ? "Reagendar sesión" : "Detalle de la sesión"}
-            </h2>
+            <h2 className="mr-auto text-base font-medium">Reagendar sesión</h2>
           </Slideover.Title>
-          <Slideover.Description className="p-5 flex flex-col h-[calc(100%-65px)]">
-            {selectedSession && wizardOpen && (
+          <Slideover.Description className="p-5 flex flex-col h-[calc(100%-65px)] overflow-y-auto">
+            {selectedSession && (
               <RescheduleWizard
                 session={selectedSession}
                 locations={locations}
                 onDone={handleRescheduled}
-                onCancel={() => setWizardOpen(false)}
+                onCancel={closeSlideover}
               />
-            )}
-            {selectedSession && !wizardOpen && (
-              <>
-                <div className="divide-y divide-slate-100 text-sm">
-                  {[
-                    ["Estudiante", <span className="capitalize">{selectedSession.studentName}</span>],
-                    ["Fecha", <span className="capitalize">{formatDate(selectedSession.date)}</span>],
-                    ["Sede", location?.name || selectedSession.locationId],
-                    ["Curso", selectedSession.course?.title || selectedSession.courseId],
-                    ["Horario", selectedSession.schedule
-                      ? `${DAYS[selectedSession.schedule.day?.toLowerCase()] || selectedSession.schedule.day} ${selectedSession.schedule.startHour} - ${selectedSession.schedule.endHour}`
-                      : "—"],
-                    ["Sesión", `${selectedSession.sessionNumber ?? "—"} de ${selectedSession.totalSessions ?? "—"}`],
-                    ["Estado", STATUS_LABEL[selectedSession.status] || selectedSession.status],
-                  ].map(([label, value]) => (
-                    <div key={label as string} className="py-2.5 flex items-start justify-between gap-4">
-                      <span className="text-slate-400 shrink-0">{label}</span>
-                      <span className="text-slate-700 font-medium text-right">{value}</span>
-                    </div>
-                  ))}
-                  {location?.address && (
-                    <div className="py-2.5 flex items-start justify-between gap-4">
-                      <span className="text-slate-400 shrink-0">Dirección</span>
-                      <span className="text-slate-500 text-right">{location.address}</span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="mt-auto pt-5 space-y-2">
-                  {selectedSession.status === "ACTIVE" && (
-                    <button
-                      type="button"
-                      onClick={() => setWizardOpen(true)}
-                      className="w-full bg-primary/80 hover:bg-primary transition-colors text-white rounded-full font-medium text-sm px-5 py-2.5"
-                    >
-                      Reagendar
-                    </button>
-                  )}
-                  <Button variant="outline-secondary" rounded className="w-full py-2.5" onClick={closeSlideover}>
-                    Cerrar
-                  </Button>
-                </div>
-              </>
             )}
           </Slideover.Description>
         </Slideover.Panel>
